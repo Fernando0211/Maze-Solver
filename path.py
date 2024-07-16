@@ -1,5 +1,5 @@
 import numpy as np
-import time
+import math
 
 p_y, i_y = 13 , 13 # Posicion inicial - Initial position
 p_x, i_x = 0 , 0
@@ -54,6 +54,7 @@ while flag == False:
         if 0 <= new_y < maze.shape[0] and 0 <= new_x < maze.shape[1]:
             if maze[new_y, new_x] == 2:
                 visited.append((new_y, new_x))
+                meta = (new_y, new_x)
                 goal = True
                 print("Completed \n")
                 #print(visited)
@@ -106,7 +107,42 @@ while flag == False:
 
     #time.sleep(0.2) # just for debugging
 
-imprimir_laberinto(i_y, i_x, maze, visited[1:len(visited) - 1])
 
-print("\n Visited: ", visited)
+#imprimir_laberinto(i_y, i_x, maze, visited[1:len(visited) - 1])
+
+#print("\n Visited: ", visited)
 #print("possible: ", possible_directions)
+
+
+cells = [(i_y, i_x)]
+point = 0
+scores = [(i_y, i_x, point)]
+
+while visited:
+    next_cells = []
+    for cell in cells:
+        coordinate = cell
+        for dy, dx in directions:
+            new_y, new_x = coordinate[0] + dy, coordinate[1] + dx
+            #print(new_y, new_x)
+            if (new_y, new_x) in visited:
+                point += 1
+                distance = round(math.sqrt((meta[1] - new_x)**2 + (meta[0] - new_y)**2), 4)
+                score = distance + point
+                scores.append((new_y, new_x, score))
+                if (new_y, new_x) not in next_cells:
+                    next_cells.append((new_y, new_x))
+
+    visited = [(y, x) for (y, x) in visited if (y, x) not in [(item[0], item[1]) for item in scores]]
+    cells = next_cells
+    
+    #print(visited)
+    print("Celdas siguientes: ", cells)
+
+print("Scores: ", scores)
+
+scores = sorted(scores, key=lambda x: x[2])
+
+print("Scores: ", scores)
+
+#print("Visited: ", visited)
